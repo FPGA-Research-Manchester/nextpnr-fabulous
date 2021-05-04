@@ -17,7 +17,7 @@ if (STATIC_BUILD)
 endif()
 
 # List of families to build
-set(FAMILIES generic ice40 ecp5 xc7)
+set(FAMILIES generic ice40 ecp5 xc7 fabulous)
 
 set(ARCH "" CACHE STRING "Architecture family for nextpnr build")
 set_property(CACHE ARCH PROPERTY STRINGS ${FAMILIES})
@@ -48,7 +48,7 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_DEBUG /W4 /wd4100 /wd4244 /wd4125 /wd4800 /wd4456 /wd4458 /wd4305 /wd4459 /wd4121 /wd4996")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /W4 /wd4100 /wd4244 /wd4125 /wd4800 /wd4456 /wd4458 /wd4305 /wd4459 /wd4121 /wd4996 /wd4127")
 else()
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -fPIC -ggdb -pipe")
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -fPIC -ggdb -pipe -g")
 set(CMAKE_CXX_FLAGS_RELEASE "-Wall -fPIC -O3 -g -pipe")
 endif()
 set(CMAKE_DEFIN)
