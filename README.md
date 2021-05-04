@@ -38,7 +38,7 @@ To build the fabulous version of nextpnr, copy the contents of the YosysFiles di
 Then build and install `nextpnr-fabulous` using the following commands:
 
 ```
-`cmake -DARCH=diko -DBUILD_GUI=OFF`
+`cmake -DARCH=fabulous -DBUILD_GUI=OFF`
 `sudo make install`
 ```
 
@@ -49,9 +49,9 @@ You are now ready to synthesize, place and route a circuit onto your architectur
 To generate a bitstream, you must also generate a bitstream spec file. This contains mapping data for the bel configuration bits, mask data and architecture metadata, and is what the program uses to generate a bitstream. You must pass this file in along with your FASM file when generating a bitstream. Information on how to generate bitstream specs and bitstreams can be found by running `python3 gen.py -help`
 
 ## Enabling/Disabling features
-To disable generic mapping of multiplier blocks to DSP blocks, comment out the `-map/diko/dsp_map.v` tag after the techmap command in your .ys file.
+To disable generic mapping of multiplier blocks to DSP blocks, comment out the `-map/fabulous/dsp_map.v` tag after the techmap command in your .ys file.
 
-To disable mapping of carry chains, comment out the `-map/diko/arith_map.v` tag after the techmap command in your .ys file. Note - carry chain mapping is not yet supported.
+To disable mapping of carry chains, comment out the `-map/fabulous/arith_map.v` tag after the techmap command in your .ys file. Note - carry chain mapping is not yet supported.
 
 ## I'm adding some new tiles! What do I need to do?
 
