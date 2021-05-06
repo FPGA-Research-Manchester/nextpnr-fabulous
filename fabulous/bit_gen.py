@@ -1832,6 +1832,7 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
 			if featureName in specDict["TileSpecs"][tileLoc].keys():
 				for bitIndex in specDict["TileSpecs"][tileLoc][featureName]:
 					tileDict[tileLoc][bitIndex] = specDict["TileSpecs"][tileLoc][featureName][bitIndex]
+
 					#if tileLoc == 'X3Y8':
 					 #print(tileDict[tileLoc])
 					 #print(featureName)
@@ -1846,14 +1847,20 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
 
 
 	#Write output string and introduce mask
-
+	coordsRE = re.compile("X(\d*)Y(\d*)")
+	num_columns = 0
+	for tileKey in tileDict:
+		coordsMatch = coordsRE.match(tileKey)
+		if int(coordsMatch.group(1)) > num_columns:
+		    num_columns = int(coordsMatch.group(1))
 	#concatenatedTileDict = {}
 	outStr = ""
 	#bitStr = "00AAFF01\n"
 	bitStr = hexstring_to_bytes("0xFAB0FAB1")
-	bit_array = [[b'' for x in range(20)] for y in range(10)]
-	coordsRE = re.compile("X(\d*)Y(\d*)")
+	bit_array = [[b'' for x in range(20)] for y in range(num_columns+1)]
+
 	default_hex = ['0','0','0','0','0','0','0','0']
+
 
 	for tileKey in tileDict:
 		coordsMatch = coordsRE.match(tileKey)
@@ -1879,6 +1886,7 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
 			    
 			#bit_array[int(coordsMatch.group(1))][frameIndex] = ''.join(bit_hex_full) + "\n" + bit_array[int(coordsMatch.group(1))][frameIndex]
 			#bit_array[int(coordsMatch.group(1))][frameIndex] = frame_bit_row + "\n" + bit_array[int(coordsMatch.group(1))][frameIndex]
+			#print(frameIndex)
 			bit_array[int(coordsMatch.group(1))][frameIndex] = bit_array[int(coordsMatch.group(1))][frameIndex] + bit_hex
 
 
