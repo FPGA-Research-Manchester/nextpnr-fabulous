@@ -1853,13 +1853,15 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
 		coordsMatch = coordsRE.match(tileKey)
 		if int(coordsMatch.group(1)) > num_columns:
 		    num_columns = int(coordsMatch.group(1))
+	num_columns = num_columns+1
 	#concatenatedTileDict = {}
 	outStr = ""
 	#bitStr = "00AAFF01\n"
 	bitStr = hexstring_to_bytes("0xFAB0FAB1")
-	bit_array = [[b'' for x in range(20)] for y in range(num_columns+1)]
+	bit_array = [[b'' for x in range(20)] for y in range(num_columns)]
+	#bit_array_check = [['' for x in range(20)] for y in range(num_columns)]
 
-	default_hex = ['0','0','0','0','0','0','0','0']
+	#default_hex = ['0','0','0','0','0','0','0','0']
 
 
 	for tileKey in tileDict:
@@ -1887,8 +1889,8 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
 			#bit_array[int(coordsMatch.group(1))][frameIndex] = ''.join(bit_hex_full) + "\n" + bit_array[int(coordsMatch.group(1))][frameIndex]
 			#bit_array[int(coordsMatch.group(1))][frameIndex] = frame_bit_row + "\n" + bit_array[int(coordsMatch.group(1))][frameIndex]
 			#print(frameIndex)
-			bit_array[int(coordsMatch.group(1))][frameIndex] = bit_array[int(coordsMatch.group(1))][frameIndex] + bit_hex
-
+			bit_array[int(coordsMatch.group(1))][frameIndex] = bit_hex + bit_array[int(coordsMatch.group(1))][frameIndex] 
+			#bit_array_check[int(coordsMatch.group(1))][frameIndex] = bit_array_check[int(coordsMatch.group(1))][frameIndex] + frame_bit_row
 
 			#frame = specDict["FrameMap"][specDict["TileMap"][tileKey]][frameIndex]
 			#for char in frame:
@@ -1908,26 +1910,37 @@ def genBitstream(fasmFile: str, specFile: str, bitstreamFile: str):
 
 		#concatenatedTileDict[tileKey] = curStr
 		outStr += curStr + "\n"
-
-	for i in range(10):
+	#print(num_columns)
+	for i in range(num_columns):
 		for j in range(20):
+		    bin_temp = "{0:b}".format(i).zfill(5)[::-1]
 		    frame_select = ['0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0']
 		    #bitStr += "X"+str(i)+", frame"+str(j)+"\n"
-		    frame_select[22+i] = '1'
+
+		    for k in range(-5,0,1):
+		        frame_select[k] = bin_temp[k]
+		    #frame_select[22+i] = '1'
 		    frame_select[j] = '1'
 		    #frame_select_temp = hex(int((''.join(frame_select))[::-1],2)).replace("0x","")
 		    frame_select_temp = (''.join(frame_select))[::-1]
-		    bit_hex_full = default_hex.copy()
+		    #bit_hex_full = default_hex.copy()
 		    #for k in range(len(frame_select_temp)):
 		        #bit_hex_full[8-len(frame_select_temp)+k] = frame_select_temp[k]
 		    #bitStr += ''.join(bit_hex_full)+"\n"
 		    #bitStr += frame_select_temp+"\n"
 		    bitStr += bitstring_to_bytes(frame_select_temp)
-		    bitStr += bit_array[i][j]		    
+		    bitStr += bit_array[i][j]
+
+		    #if '1' in bit_array_check[i][j]:
+		    #    bitStr += bitstring_to_bytes(frame_select_temp)
+		    #    bitStr += bit_array[i][j]
+		    #else:
+		    #    continue
+		    		    
 	#Note - format in output file is line by line:
 	#Tile Loc, Tile Type, X, Y, bits...... \n 
 	#Each line is one tile
-	#print(outStr, file = open(bitstreamFile.replace("bit","fasm"), "w+"))
+	print(outStr, file = open(bitstreamFile.replace("bin","fasm"), "w+"))
 	#print(bitStr, file = open(bitstreamFile, "w+"))
 	#with open(bitstreamFile.replace("bit","bin"), 'bw+') as f:
 	with open(bitstreamFile, 'bw+') as f:
