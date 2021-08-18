@@ -1,0 +1,53 @@
+read_verilog template.v
+
+#begin:
+    read_verilog -lib +/fabulous/cells_sim.v
+    read_verilog -lib +/fabulous/cells_xtra.v
+    hierarchy -check -top template
+
+#flatten:     (only if -flatten)
+    proc
+    flatten
+
+#coarse:
+    synth -noalumacc -run coarse 
+
+#bram:
+    #memory_bram -rules +/fabulous/brams.txt
+    #techmap -map +/fabulous/brams_map.v
+#
+#dram:
+#    memory_bram -rules +/xilinx/drams.txt
+#    techmap -map +/xilinx/drams_map.v
+
+fine:
+    opt -fast -full
+    memory_map
+    dffsr2dff
+    clk2fflogic
+    opt -full
+    techmap -map +/techmap.v -map +/fabulous/dsp_map.v #-map +/fabulous/arith_map.v 
+#    techmap -map +/fabulous/dsp_map.v
+    opt -fast
+
+map_luts:
+    #abc -luts 2:2,3,4 #2:2,3,6:5 #,10,20 [-dff]
+    abc -luts 4:4 #2:2,3,6:5 #,10,20 [-dff]
+    #abc -luts 1,2,2,4:8
+    clean
+
+map_cells:
+    techmap -map +/fabulous/cells_map.v
+    dffinit -ff FDRE Q INIT -ff FDCE Q INIT -ff FDPE Q INIT
+    clean
+
+check:
+    hierarchy -check
+    stat
+    check -noinit
+
+    iopadmap -inpad IBUF O -outpad OBUF I -widthparam bufwidth #-bits 
+
+    show
+    write_json template.json
+    #write_verilog template_test.v
